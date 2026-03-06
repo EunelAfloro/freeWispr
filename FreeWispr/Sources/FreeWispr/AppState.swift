@@ -23,8 +23,8 @@ class AppState: ObservableObject {
             statusMessage = "Needs Accessibility permission"
         }
 
-        // Download default model if needed
-        if !modelManager.isModelDownloaded(selectedModel) {
+        // Download model + Core ML encoder if needed
+        if !modelManager.isModelDownloaded(selectedModel) || !modelManager.isCoreMLDownloaded(selectedModel) {
             statusMessage = "Downloading \(selectedModel.displayName) model..."
             do {
                 try await modelManager.downloadModel(selectedModel)
@@ -121,7 +121,7 @@ class AppState: ObservableObject {
         selectedModel = model
         transcriber.unloadModel()
 
-        if !modelManager.isModelDownloaded(model) {
+        if !modelManager.isModelDownloaded(model) || !modelManager.isCoreMLDownloaded(model) {
             statusMessage = "Downloading \(model.displayName)..."
             do {
                 try await modelManager.downloadModel(model)
