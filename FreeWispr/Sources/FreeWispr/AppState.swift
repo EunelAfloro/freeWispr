@@ -6,6 +6,7 @@ class AppState: ObservableObject {
     @Published var isTranscribing = false
     @Published var statusMessage = "Ready"
     @Published var selectedModel: ModelSize = .base
+    private var isSetUp = false
 
     let hotkeyManager = HotkeyManager()
     let audioRecorder = AudioRecorder()
@@ -14,6 +15,9 @@ class AppState: ObservableObject {
     let modelManager = ModelManager()
 
     func setup() async {
+        guard !isSetUp else { return }
+        isSetUp = true
+
         // Check accessibility permission
         if !HotkeyManager.checkAccessibilityPermission() {
             statusMessage = "Needs Accessibility permission"
