@@ -18,6 +18,7 @@ struct FreeWisprApp: App {
 
 struct MenuBarView: View {
     @EnvironmentObject var appState: AppState
+    @State private var hasAppeared = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -52,6 +53,7 @@ struct MenuBarView: View {
                 }
                 .frame(width: 160)
                 .onChange(of: appState.selectedModel) { _, newValue in
+                    guard hasAppeared else { return }
                     Task { await appState.switchModel(to: newValue) }
                 }
             }
@@ -72,6 +74,7 @@ struct MenuBarView: View {
         .frame(width: 280)
         .task {
             await appState.setup()
+            hasAppeared = true
         }
     }
 }

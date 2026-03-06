@@ -8,9 +8,11 @@ class AudioRecorder: ObservableObject {
     private let audioEngine = AVAudioEngine()
     private var audioBuffer: [Float] = []
 
-    var silenceThreshold: Float = 0.01
+    var silenceThreshold: Float = 0.03
     var silenceTimeout: TimeInterval = 1.5
+    var maxRecordingDuration: TimeInterval = 30
     private var lastSpeechTime = Date()
+    private var recordingStartTime = Date()
 
     var onRecordingComplete: (([Float]) -> Void)?
 
@@ -27,6 +29,7 @@ class AudioRecorder: ObservableObject {
         audioBuffer.removeAll()
         isRecording = true
         lastSpeechTime = Date()
+        recordingStartTime = Date()
 
         let inputNode = audioEngine.inputNode
         let hardwareFormat = inputNode.outputFormat(forBus: 0)
@@ -60,9 +63,15 @@ class AudioRecorder: ObservableObject {
                 self.audioBuffer.append(contentsOf: samples)
                 self.audioLevel = rms
 
+                let now = Date()
                 if rms > self.silenceThreshold {
-                    self.lastSpeechTime = Date()
-                } else if Date().timeIntervalSince(self.lastSpeechTime) > self.silenceTimeout {
+                    self.lastSpeechTime = now
+                }
+
+                let silenceExceeded = now.timeIntervalSince(self.lastSpeechTime) > self.silenceTimeout
+                let maxDurationExceeded = now.timeIntervalSince(self.recordingStartTime) > self.maxRecordingDuration
+
+                if silenceExceeded || maxDurationExceeded {
                     self.stopRecording()
                 }
             }
