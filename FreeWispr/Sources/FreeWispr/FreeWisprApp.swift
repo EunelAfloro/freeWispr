@@ -6,7 +6,7 @@ struct MenuBarIcon: View {
     let isTranscribing: Bool
 
     private var menuBarImage: NSImage? {
-        guard let url = Bundle.module.url(forResource: "MenuBarIcon", withExtension: "png", subdirectory: "Resources"),
+        guard let url = Bundle.appResources.url(forResource: "MenuBarIcon", withExtension: "png", subdirectory: "Resources"),
               let image = NSImage(contentsOf: url) else { return nil }
         image.size = NSSize(width: 18, height: 18)
         image.isTemplate = true
