@@ -18,19 +18,11 @@
 
 ---
 
-<!--
 ## Demo
 
 <p align="center">
   <img src="assets/demo.gif" alt="FreeWispr demo" width="600">
 </p>
-
-To record a demo GIF:
-1. Open QuickTime Player > File > New Screen Recording
-2. Record a short clip showing hold-to-dictate in action
-3. Convert to GIF: `ffmpeg -i demo.mov -vf "fps=15,scale=600:-1" assets/demo.gif`
-4. Uncomment this section
--->
 
 ## Why FreeWispr?
 
