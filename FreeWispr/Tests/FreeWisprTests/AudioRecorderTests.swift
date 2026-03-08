@@ -1,5 +1,5 @@
 import XCTest
-@testable import FreeWispr
+@testable import FreeWisprCore
 
 final class AudioRecorderTests: XCTestCase {
 

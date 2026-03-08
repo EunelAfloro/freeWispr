@@ -1,5 +1,17 @@
 import Foundation
 
+enum ModelDownloadError: LocalizedError {
+    case unzipFailed(Int32)
+    case outputMissing(String)
+
+    var errorDescription: String? {
+        switch self {
+        case .unzipFailed(let code): return "Failed to extract Core ML encoder (unzip exit code \(code))"
+        case .outputMissing(let path): return "Expected model file not found after extraction: \(path)"
+        }
+    }
+}
+
 enum ModelSize: String, CaseIterable, Identifiable {
     case tiny, base, small, medium
 
@@ -96,12 +108,16 @@ class ModelManager: ObservableObject {
             process.arguments = ["-o", tempZip.path, "-d", unzipDir.path]
             try process.run()
             process.waitUntilExit()
+            try? FileManager.default.removeItem(at: tempZip)
 
             if process.terminationStatus != 0 {
-            } else {
+                try? FileManager.default.removeItem(at: localCoreMLPath(for: model))
+                throw ModelDownloadError.unzipFailed(process.terminationStatus)
             }
 
-            try? FileManager.default.removeItem(at: tempZip)
+            guard FileManager.default.fileExists(atPath: localCoreMLPath(for: model).path) else {
+                throw ModelDownloadError.outputMissing(localCoreMLPath(for: model).path)
+            }
         }
 
         downloadProgress = 1.0

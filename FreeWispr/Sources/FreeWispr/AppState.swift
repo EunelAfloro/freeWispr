@@ -5,6 +5,7 @@ import SwiftUI
 class AppState: ObservableObject {
     @Published var isRecording = false
     @Published var isTranscribing = false
+    @Published var isSwitchingModel = false
     @Published var statusMessage = "Ready"
     @Published var selectedModel: ModelSize = .base
     private var isSetUp = false
@@ -14,6 +15,7 @@ class AppState: ObservableObject {
     let transcriber = WhisperTranscriber()
     let textInjector = TextInjector()
     let modelManager = ModelManager()
+    let updateChecker = UpdateChecker()
 
     func setup() async {
         guard !isSetUp else { return }
@@ -70,6 +72,8 @@ class AppState: ObservableObject {
         } catch {
             statusMessage = "Mic error: \(error.localizedDescription)"
         }
+
+        Task { await updateChecker.checkForUpdate() }
     }
 
     func startRecording() {
@@ -115,7 +119,10 @@ class AppState: ObservableObject {
     }
 
     func switchModel(to model: ModelSize) async {
-        selectedModel = model
+        guard !isSwitchingModel else { return }
+        isSwitchingModel = true
+        defer { isSwitchingModel = false }
+
         transcriber.unloadModel()
 
         if !modelManager.isModelDownloaded(model) || !modelManager.isCoreMLDownloaded(model) {
@@ -123,16 +130,18 @@ class AppState: ObservableObject {
             do {
                 try await modelManager.downloadModel(model)
             } catch {
-                statusMessage = "Download failed"
+                statusMessage = "Download failed: \(error.localizedDescription)"
+                // Revert UI selection to the model that is still loaded (none now — stay on previous)
                 return
             }
         }
 
         do {
             try transcriber.loadModel(at: modelManager.localModelPath(for: model))
+            selectedModel = model   // Commit only after successful load
             statusMessage = "Ready"
         } catch {
-            statusMessage = "Failed to load model"
+            statusMessage = "Failed to load model: \(error.localizedDescription)"
         }
     }
 }

@@ -29,7 +29,7 @@ class WhisperTranscriber: ObservableObject {
         isModelLoaded = false
     }
 
-    func transcribe(audioSamples: [Float], language: String? = nil) async throws -> String {
+    func transcribe(audioSamples: [Float]) async throws -> String {
         guard let whisper = whisper else {
             throw TranscriberError.modelNotLoaded
         }

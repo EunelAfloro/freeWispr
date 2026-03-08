@@ -24,11 +24,10 @@ struct MenuBarIcon: View {
     }
 }
 
-@main
-struct FreeWisprApp: App {
+public struct FreeWisprApp: App {
     @StateObject private var appState = AppState()
 
-    init() {
+    public init() {
         // Prevent duplicate instances (only when running as .app with a bundle ID)
         guard let bundleID = Bundle.main.bundleIdentifier else { return }
         let runningApps = NSWorkspace.shared.runningApplications.filter {
@@ -42,7 +41,7 @@ struct FreeWisprApp: App {
         }
     }
 
-    var body: some Scene {
+    public var body: some Scene {
         MenuBarExtra {
             MenuBarView()
                 .environmentObject(appState)
@@ -86,16 +85,19 @@ struct MenuBarView: View {
             HStack {
                 Text("Model:")
                 Spacer()
-                Picker("", selection: $appState.selectedModel) {
+                Picker("", selection: Binding(
+                    get: { appState.selectedModel },
+                    set: { newValue in
+                        guard hasAppeared, !appState.isSwitchingModel else { return }
+                        Task { await appState.switchModel(to: newValue) }
+                    }
+                )) {
                     ForEach(ModelSize.allCases) { size in
                         Text("\(size.displayName) (\(size.sizeDescription))").tag(size)
                     }
                 }
                 .frame(width: 160)
-                .onChange(of: appState.selectedModel) { _, newValue in
-                    guard hasAppeared else { return }
-                    Task { await appState.switchModel(to: newValue) }
-                }
+                .disabled(appState.isSwitchingModel)
             }
 
             if appState.modelManager.isDownloading {
@@ -105,10 +107,32 @@ struct MenuBarView: View {
 
             Divider()
 
-            Button("Quit FreeWispr") {
-                NSApplication.shared.terminate(nil)
+            if appState.updateChecker.updateAvailable,
+               let latest = appState.updateChecker.latestVersion,
+               let url = appState.updateChecker.releaseURL {
+                Button(action: { NSWorkspace.shared.open(url) }) {
+                    HStack(spacing: 4) {
+                        Image(systemName: "arrow.down.circle.fill")
+                            .foregroundColor(.green)
+                        Text("Update available: v\(latest)")
+                            .foregroundColor(.green)
+                    }
+                }
+                .buttonStyle(.plain)
+
+                Divider()
             }
-            .keyboardShortcut("q", modifiers: .command)
+
+            HStack {
+                Text("v\(appState.updateChecker.currentVersion)")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                Spacer()
+                Button("Quit FreeWispr") {
+                    NSApplication.shared.terminate(nil)
+                }
+                .keyboardShortcut("q", modifiers: .command)
+            }
         }
         .padding(12)
         .frame(width: 280)
