@@ -68,8 +68,27 @@ class AudioRecorder: ObservableObject {
         bufferQueue.sync {
             audioBuffer.removeAll(keepingCapacity: true)
         }
-        try audioEngine.start()
+        do {
+            try audioEngine.start()
+        } catch {
+            // The hardware format may have changed (e.g. another app like Teams
+            // reconfigured the mic). Rebuild the tap with the current format and
+            // retry once.
+            resetEngine()
+            try prepareEngine()
+            try audioEngine.start()
+        }
         isRecording = true
+    }
+
+    /// Tear down the audio tap so the next attempt rebuilds with the current
+    /// hardware format.
+    private func resetEngine() {
+        audioEngine.stop()
+        if isTapInstalled {
+            audioEngine.inputNode.removeTap(onBus: 0)
+            isTapInstalled = false
+        }
     }
 
     func stopRecording() {

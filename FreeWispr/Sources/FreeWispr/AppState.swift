@@ -82,9 +82,8 @@ class AppState: ObservableObject {
             try audioRecorder.startRecording()
             isRecording = true
             statusMessage = "Listening..."
-            } catch {
-            statusMessage = "Mic error: \(error.localizedDescription)"
-
+        } catch {
+            statusMessage = "Mic busy — close other audio apps and retry"
         }
     }
 
