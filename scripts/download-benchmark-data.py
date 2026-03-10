@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Download FLEURS en_us benchmark samples for FreeWispr pipeline testing.
 
-Saves 20 test samples as 16kHz mono WAV files + ground truth .txt files.
+Saves 50 test samples as WAV files + ground truth .txt files.
 Downloads audio tar + metadata TSV directly from HuggingFace Hub,
 bypassing the legacy fleurs.py loading script.
 

@@ -53,7 +53,7 @@ final class TextCorrector {
             let response = try await session.respond(to: text)
             let result = response.content.trimmingCharacters(in: .whitespacesAndNewlines)
 
-            if Self.looksLikeRefusal(result, originalText: text) {
+            if result.isEmpty || Self.looksLikeRefusal(result, originalText: text) {
                 return text
             }
             return result

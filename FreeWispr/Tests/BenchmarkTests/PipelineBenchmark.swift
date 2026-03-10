@@ -90,7 +90,9 @@ final class PipelineBenchmark: XCTestCase {
         }
 
         let modelSizeName = ProcessInfo.processInfo.environment["BENCHMARK_MODEL"] ?? "base"
-        let modelSize = ModelSize(rawValue: modelSizeName)!
+        guard let modelSize = ModelSize(rawValue: modelSizeName) else {
+            throw XCTSkip("Unknown model size: \(modelSizeName)")
+        }
         let modelManager = ModelManager()
         let modelPath = modelManager.localModelPath(for: modelSize)
 

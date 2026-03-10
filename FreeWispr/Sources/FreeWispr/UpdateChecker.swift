@@ -32,7 +32,8 @@ class UpdateChecker: ObservableObject {
         latestVersion = version
         releaseURL = url
 
-        // Find .dmg asset URL
+        // Find .dmg asset URL (reset first to avoid stale values)
+        dmgAssetURL = nil
         if let assets = json["assets"] as? [[String: Any]] {
             dmgAssetURL = assets
                 .first { ($0["name"] as? String)?.hasSuffix(".dmg") == true }

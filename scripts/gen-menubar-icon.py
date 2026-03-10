@@ -2,7 +2,6 @@
 """Generate menu bar icon: sonic boom — jet with vapor cone."""
 
 from PIL import Image, ImageDraw
-import math
 
 
 def draw_icon(size: int) -> Image.Image:
