@@ -4,7 +4,7 @@ import Foundation
 @MainActor
 class UpdateChecker: ObservableObject {
     @Published var latestVersion: String? = nil
-    @Published var releaseURL: URL? = nil
+    private var releaseURL: URL?
     @Published var isUpdating = false
 
     var updateAvailable: Bool {
@@ -43,6 +43,7 @@ class UpdateChecker: ObservableObject {
     }
 
     func downloadAndInstall() async {
+        guard !isUpdating else { return }
         guard let dmgURL = dmgAssetURL else {
             // Fallback: open release page
             if let url = releaseURL { NSWorkspace.shared.open(url) }
