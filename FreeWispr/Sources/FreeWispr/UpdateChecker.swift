@@ -6,7 +6,6 @@ class UpdateChecker: ObservableObject {
     @Published var latestVersion: String? = nil
     @Published var releaseURL: URL? = nil
     @Published var isUpdating = false
-    @Published var updateProgress: Double = 0
 
     var updateAvailable: Bool {
         guard let latest = latestVersion else { return false }
@@ -50,7 +49,6 @@ class UpdateChecker: ObservableObject {
         }
 
         isUpdating = true
-        updateProgress = 0
 
         do {
             let (tempURL, _) = try await URLSession.shared.download(from: dmgURL, delegate: nil)
