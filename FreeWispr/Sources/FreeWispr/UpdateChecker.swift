@@ -1,9 +1,12 @@
+import AppKit
 import Foundation
 
 @MainActor
 class UpdateChecker: ObservableObject {
     @Published var latestVersion: String? = nil
     @Published var releaseURL: URL? = nil
+    @Published var isUpdating = false
+    @Published var updateProgress: Double = 0
 
     var updateAvailable: Bool {
         guard let latest = latestVersion else { return false }
@@ -13,6 +16,7 @@ class UpdateChecker: ObservableObject {
     let currentVersion: String = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "0.0.0"
 
     private let apiURL = URL(string: "https://api.github.com/repos/ygivenx/freeWispr/releases/latest")!
+    private var dmgAssetURL: URL?
 
     func checkForUpdate() async {
         var request = URLRequest(url: apiURL)
@@ -28,6 +32,40 @@ class UpdateChecker: ObservableObject {
         let version = tag.hasPrefix("v") ? String(tag.dropFirst()) : tag
         latestVersion = version
         releaseURL = url
+
+        // Find .dmg asset URL
+        if let assets = json["assets"] as? [[String: Any]] {
+            dmgAssetURL = assets
+                .first { ($0["name"] as? String)?.hasSuffix(".dmg") == true }
+                .flatMap { $0["browser_download_url"] as? String }
+                .flatMap { URL(string: $0) }
+        }
+    }
+
+    func downloadAndInstall() async {
+        guard let dmgURL = dmgAssetURL else {
+            // Fallback: open release page
+            if let url = releaseURL { NSWorkspace.shared.open(url) }
+            return
+        }
+
+        isUpdating = true
+        updateProgress = 0
+
+        do {
+            let (tempURL, _) = try await URLSession.shared.download(from: dmgURL, delegate: nil)
+            let dest = FileManager.default.temporaryDirectory.appendingPathComponent("FreeWispr-update.dmg")
+            try? FileManager.default.removeItem(at: dest)
+            try FileManager.default.moveItem(at: tempURL, to: dest)
+
+            // Open the DMG — macOS mounts it, user sees the drag-to-install window
+            NSWorkspace.shared.open(dest)
+            isUpdating = false
+        } catch {
+            isUpdating = false
+            // Fallback: open release page
+            if let url = releaseURL { NSWorkspace.shared.open(url) }
+        }
     }
 
     // Simple semver comparison: "1.2.3" > "1.1.0"

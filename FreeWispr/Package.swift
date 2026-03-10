@@ -27,5 +27,10 @@ let package = Package(
             dependencies: ["FreeWisprCore"],
             path: "Tests/FreeWisprTests"
         ),
+        .testTarget(
+            name: "BenchmarkTests",
+            dependencies: ["FreeWisprCore"],
+            path: "Tests/BenchmarkTests"
+        ),
     ]
 )

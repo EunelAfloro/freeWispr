@@ -8,7 +8,17 @@ class AppState: ObservableObject {
     @Published var isSwitchingModel = false
     @Published var statusMessage = "Ready"
     @Published var selectedModel: ModelSize = .base
+
+    enum AICorrectionStatus {
+        case unavailable  // not macOS 26+
+        case needsSetup   // macOS 26+ but Apple Intelligence not enabled
+        case active       // working
+    }
+    @Published var aiCorrectionStatus: AICorrectionStatus = .unavailable
+    @Published var aiCorrectionEnabled = false
+
     private var isSetUp = false
+    private var textCorrector: Any?
 
     let hotkeyManager = HotkeyManager()
     let audioRecorder = AudioRecorder()
@@ -46,6 +56,15 @@ class AppState: ObservableObject {
             statusMessage = "Failed to load model: \(error.localizedDescription)"
             return
         }
+
+        // Initialize on-device LLM text corrector if available
+        #if canImport(FoundationModels)
+        if #available(macOS 26.0, *) {
+            let corrector = TextCorrector()
+            textCorrector = corrector
+            aiCorrectionStatus = corrector.isAvailable ? .active : .needsSetup
+        }
+        #endif
 
         // Set up push-to-talk: hold to record, release to transcribe
         hotkeyManager.onHotkeyDown = { [weak self] in
@@ -106,7 +125,16 @@ class AppState: ObservableObject {
         do {
             let text = try await transcriber.transcribe(audioSamples: samples)
             if !text.isEmpty {
-                textInjector.injectText(text)
+                var finalText = text
+                #if canImport(FoundationModels)
+                if #available(macOS 26.0, *),
+                   aiCorrectionEnabled,
+                   let corrector = textCorrector as? TextCorrector {
+                    statusMessage = "Correcting..."
+                    finalText = await corrector.correct(text)
+                }
+                #endif
+                textInjector.injectText(finalText)
             }
             statusMessage = "Ready"
         } catch {

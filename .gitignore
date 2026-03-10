@@ -8,3 +8,5 @@ build/
 certs/
 *.p12
 .worktrees/
+scripts/benchmark-data/
+scripts/benchmark-results.tsv

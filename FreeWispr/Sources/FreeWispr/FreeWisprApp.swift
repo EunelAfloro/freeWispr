@@ -105,20 +105,75 @@ struct MenuBarView: View {
                     .progressViewStyle(.linear)
             }
 
+            // AI Cleanup (macOS 26+ / Apple Intelligence)
+            if appState.aiCorrectionStatus == .active {
+                HStack(spacing: 4) {
+                    Image(systemName: "sparkles")
+                        .font(.caption2)
+                        .foregroundColor(.secondary)
+                    Text("AI Cleanup")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                    Spacer()
+                    Toggle("", isOn: $appState.aiCorrectionEnabled)
+                        .toggleStyle(.switch)
+                        .controlSize(.mini)
+                        .tint(Color(nsColor: NSColor.systemGray))
+                        .scaleEffect(0.8)
+                        .frame(width: 28)
+                }
+            } else if appState.aiCorrectionStatus == .needsSetup {
+                Button {
+                    if let url = URL(string: "x-apple.systempreferences:com.apple.preference.AppleIntelligence") {
+                        NSWorkspace.shared.open(url)
+                    }
+                } label: {
+                    HStack(spacing: 5) {
+                        Image(systemName: "sparkles")
+                            .font(.caption2)
+                        Text("Enable Apple Intelligence")
+                            .font(.caption)
+                    }
+                    .foregroundStyle(
+                        LinearGradient(
+                            colors: [
+                                Color(nsColor: NSColor.systemGray),
+                                Color.white.opacity(0.9),
+                                Color(nsColor: NSColor.systemGray),
+                            ],
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        )
+                    )
+                }
+                .buttonStyle(.plain)
+            }
+
             Divider()
 
             if appState.updateChecker.updateAvailable,
-               let latest = appState.updateChecker.latestVersion,
-               let url = appState.updateChecker.releaseURL {
-                Button(action: { NSWorkspace.shared.open(url) }) {
+               let latest = appState.updateChecker.latestVersion {
+                if appState.updateChecker.isUpdating {
                     HStack(spacing: 4) {
-                        Image(systemName: "arrow.down.circle.fill")
-                            .foregroundColor(.green)
-                        Text("Update available: v\(latest)")
-                            .foregroundColor(.green)
+                        ProgressView()
+                            .controlSize(.small)
+                        Text("Downloading update...")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
                     }
+                } else {
+                    Button {
+                        Task { await appState.updateChecker.downloadAndInstall() }
+                    } label: {
+                        HStack(spacing: 4) {
+                            Image(systemName: "arrow.down.circle.fill")
+                                .foregroundColor(.green)
+                            Text("Update to v\(latest)")
+                                .foregroundColor(.green)
+                        }
+                    }
+                    .buttonStyle(.plain)
                 }
-                .buttonStyle(.plain)
 
                 Divider()
             }
