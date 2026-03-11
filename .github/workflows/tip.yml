@@ -1,0 +1,146 @@
+name: Tip Release
+
+on:
+  workflow_dispatch:  # manual trigger from any branch via Actions UI
+
+permissions:
+  contents: write
+
+jobs:
+  tip:
+    runs-on: macos-26
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install signing certificate
+        env:
+          CERTIFICATE_P12: ${{ secrets.CERTIFICATE_P12 }}
+          CERTIFICATE_PASSWORD: ${{ secrets.CERTIFICATE_PASSWORD }}
+        run: |
+          KEYCHAIN_PATH="$RUNNER_TEMP/signing.keychain-db"
+          KEYCHAIN_PASSWORD="$(openssl rand -base64 32)"
+
+          security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          security set-keychain-settings -lut 21600 "$KEYCHAIN_PATH"
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+
+          CERT_PATH="$RUNNER_TEMP/certificate.p12"
+          echo "$CERTIFICATE_P12" | base64 --decode > "$CERT_PATH"
+          security import "$CERT_PATH" \
+            -P "$CERTIFICATE_PASSWORD" \
+            -A \
+            -t cert \
+            -f pkcs12 \
+            -k "$KEYCHAIN_PATH"
+          rm -f "$CERT_PATH"
+
+          security list-keychains -d user -s "$KEYCHAIN_PATH" $(security list-keychains -d user | tr -d '"')
+          security set-key-partition-list -S apple-tool:,apple: -s -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+
+          IDENTITY=$(security find-identity -v -p codesigning "$KEYCHAIN_PATH" | head -1 | sed 's/.*"\(.*\)".*/\1/')
+          echo "SIGNING_IDENTITY=$IDENTITY" >> "$GITHUB_ENV"
+
+      - name: Set up notarization credentials
+        env:
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          APP_SPECIFIC_PASSWORD: ${{ secrets.APP_SPECIFIC_PASSWORD }}
+        run: |
+          xcrun notarytool store-credentials "FreeWispr-notarize" \
+            --apple-id "$APPLE_ID" \
+            --team-id "$APPLE_TEAM_ID" \
+            --password "$APP_SPECIFIC_PASSWORD"
+
+      - name: Build release binary
+        run: |
+          cd FreeWispr
+          swift build -c release --arch arm64
+
+      - name: Assemble .app bundle
+        run: |
+          APP_NAME="FreeWispr"
+          SHORT_SHA="$(git rev-parse --short HEAD)"
+          BUILD_DIR="build"
+          APP_BUNDLE="$BUILD_DIR/$APP_NAME.app"
+
+          mkdir -p "$APP_BUNDLE/Contents/MacOS"
+          mkdir -p "$APP_BUNDLE/Contents/Resources"
+
+          cp "FreeWispr/.build/arm64-apple-macosx/release/$APP_NAME" "$APP_BUNDLE/Contents/MacOS/$APP_NAME"
+          cp "FreeWispr/Sources/$APP_NAME/Info.plist" "$APP_BUNDLE/Contents/Info.plist"
+          cp "FreeWispr/Sources/$APP_NAME/Resources/AppIcon.icns" "$APP_BUNDLE/Contents/Resources/"
+          cp -R "FreeWispr/.build/arm64-apple-macosx/release/${APP_NAME}_${APP_NAME}Core.bundle" "$APP_BUNDLE/Contents/Resources/"
+
+          # Stamp version as <plist-version>-tip+<sha>
+          PLIST_VERSION=$(/usr/libexec/PlistBuddy -c "Print :CFBundleShortVersionString" "$APP_BUNDLE/Contents/Info.plist")
+          TIP_VERSION="${PLIST_VERSION}-tip+${SHORT_SHA}"
+          /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $TIP_VERSION" "$APP_BUNDLE/Contents/Info.plist"
+          /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $TIP_VERSION" "$APP_BUNDLE/Contents/Info.plist"
+
+      - name: Code sign
+        run: |
+          codesign --force --deep \
+            --sign "$SIGNING_IDENTITY" \
+            --options runtime \
+            --entitlements "FreeWispr/FreeWispr.entitlements" \
+            --timestamp \
+            "build/FreeWispr.app"
+
+      - name: Notarize
+        run: |
+          ditto -c -k --keepParent "build/FreeWispr.app" "build/FreeWispr-notarize.zip"
+
+          xcrun notarytool submit "build/FreeWispr-notarize.zip" \
+            --keychain-profile "FreeWispr-notarize" \
+            --wait
+
+          rm -f "build/FreeWispr-notarize.zip"
+          xcrun stapler staple "build/FreeWispr.app"
+
+      - name: Create DMG
+        run: |
+          DMG_PATH="build/FreeWispr-tip.dmg"
+          DMG_STAGING="build/dmg-staging"
+
+          mkdir -p "$DMG_STAGING"
+          cp -R "build/FreeWispr.app" "$DMG_STAGING/"
+          ln -s /Applications "$DMG_STAGING/Applications"
+
+          hdiutil create \
+            -volname "FreeWispr" \
+            -srcfolder "$DMG_STAGING" \
+            -ov \
+            -format UDZO \
+            "$DMG_PATH"
+
+          rm -rf "$DMG_STAGING"
+          codesign --force --sign "$SIGNING_IDENTITY" --timestamp "$DMG_PATH"
+
+      - name: Update tip release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          SHORT_SHA="$(git rev-parse --short HEAD)"
+          BRANCH="${GITHUB_REF_NAME}"
+          DATE="$(date -u +%Y-%m-%d)"
+
+          # Delete existing tip release and tag
+          gh release delete tip --yes --cleanup-tag 2>/dev/null || true
+
+          gh release create tip \
+            build/FreeWispr-tip.dmg \
+            --title "FreeWispr tip" \
+            --notes "$(cat <<EOF
+          Built from \`${SHORT_SHA}\` on branch \`${BRANCH}\` (${DATE}).
+
+          **This is a pre-release build for testing.**
+          For daily use, grab the [latest stable release](https://github.com/ygivenx/freeWispr/releases/latest).
+          EOF
+          )" \
+            --prerelease
+
+      - name: Clean up keychain
+        if: always()
+        run: |
+          KEYCHAIN_PATH="$RUNNER_TEMP/signing.keychain-db"
+          security delete-keychain "$KEYCHAIN_PATH" 2>/dev/null || true
