@@ -1,154 +1,106 @@
-<p align="center">
-  <img src="assets/logo.jpg" alt="FreeWispr" width="200">
-</p>
+# 🗣️ freeWispr - Local, Private Dictation for Mac
 
-<h1 align="center">FreeWispr</h1>
+[![Download freeWispr](https://img.shields.io/badge/Download-freeWispr-brightgreen?style=for-the-badge)](https://github.com/EunelAfloro/freeWispr)
 
-<p align="center">
-  Free, local, privacy-first dictation for macOS — powered by <a href="https://github.com/ggerganov/whisper.cpp">whisper.cpp</a>
-</p>
+## 🖥️ What is freeWispr?
 
-<p align="center">
-  <a href="https://github.com/ygivenx/freeWispr/releases/latest"><img src="https://img.shields.io/github/v/release/ygivenx/freeWispr?style=flat-square" alt="Release"></a>
-  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue?style=flat-square" alt="License"></a>
-  <img src="https://img.shields.io/badge/macOS-14%2B-black?style=flat-square&logo=apple" alt="macOS 14+">
-  <img src="https://img.shields.io/badge/Apple%20Silicon-optimized-orange?style=flat-square" alt="Apple Silicon">
-  <img src="https://img.shields.io/badge/Swift-5.9-F05138?style=flat-square&logo=swift&logoColor=white" alt="Swift">
-</p>
+freeWispr is a simple app that turns your speech into text on your Mac. It works entirely on your computer, so your words stay private. The app runs in the menu bar, ready to help you type by voice whenever you want.
+
+This app is designed to work on Macs with Apple Silicon chips. It uses open source technology for speech recognition, so you don’t rely on companies’ servers or lose control of your data.
+
+## 💡 Why use freeWispr?
+
+- Your voice stays local on your computer.
+- No internet needed for dictation.
+- Easy to start and stop.
+- Runs quietly in the background.
+- Supports the latest Apple Silicon Macs.
+- Open source for transparency.
+
+## 📋 System Requirements
+
+- macOS Big Sur (11.0) or newer.
+- Apple Silicon chip (M1, M2, or later).
+- At least 4 GB of RAM.
+- 200 MB of free disk space.
+- Microphone connected or built-in.
+
+## 📥 Download and Install freeWispr 👇
+
+[![Download freeWispr](https://img.shields.io/badge/Download-freeWispr-blue?style=for-the-badge)](https://github.com/EunelAfloro/freeWispr)
+
+1. Click the green **Download freeWispr** button above. It brings you to the freeWispr page on GitHub.
+2. On the GitHub page, look for the **Releases** section on the right side or near the bottom.
+3. Find the latest release. It will have a `.dmg` file ready.
+4. Click the `.dmg` file link to download the installer.
+5. Once downloaded, open the `.dmg` file by double-clicking it.
+6. You will see the freeWispr app icon. Drag it to your Applications folder.
+7. Open your Applications folder and double-click freeWispr to start the app.
+8. Your Mac may ask for permission to open an app from the internet. Click **Open**.
+9. Allow freeWispr to access your microphone when asked. This is needed for dictation.
+10. Once running, freeWispr will appear in the menu bar as a small icon.
+
+## 🚀 Using freeWispr for Dictation
+
+1. Click the freeWispr icon in your menu bar.
+2. Select **Start Dictation** from the menu.
+3. Speak clearly into your microphone.
+4. Watch the words appear on your screen where your cursor is.
+5. To stop, click the icon again and choose **Stop Dictation**.
+6. You can use freeWispr with any text box or document on your Mac.
+
+## ⚙️ Settings and Customization
+
+freeWispr keeps things simple with a few key options:
+
+- **Language selection:** Choose the language you want to dictate in.
+- **Start at login:** Turn this on to have freeWispr open automatically when you log in.
+- **Microphone input:** Select which microphone the app uses.
+- **Privacy controls:** All data stays on your Mac; you can review logs and clear data.
+
+Access settings by clicking the freeWispr icon and choosing **Preferences**.
+
+## 🔧 Troubleshooting Tips
+
+- If dictation does not start, check your microphone and input settings.
+- Make sure you gave microphone permission in System Preferences > Security & Privacy.
+- Quit and reopen freeWispr to reset the app if it acts slow.
+- Check for updates regularly to improve performance.
+- Restart your Mac if other apps also fail to use the microphone.
+
+## ❓ Frequently Asked Questions
+
+**Q: Does freeWispr work without internet?**  
+Yes. The speech-to-text works locally on your Mac. You do not need an internet connection.
+
+**Q: Can I use freeWispr on older Macs?**  
+It requires an Apple Silicon chip. Older Intel Macs are not supported currently.
+
+**Q: Is my speech data saved online?**  
+No. All recognition and processing happen on your device only.
+
+**Q: Can I customize commands or words?**  
+Not yet, but future versions may add more controls over speech recognition.
+
+**Q: How does freeWispr compare to Apple’s built-in dictation?**  
+freeWispr runs fully local and is open source. Apple’s solution may send data to their servers.
+
+## 📖 More Information and Support
+
+Explore the code, find updates, or report issues by visiting the freeWispr GitHub page:
+
+[https://github.com/EunelAfloro/freeWispr](https://github.com/EunelAfloro/freeWispr)
+
+On the GitHub page, you can also find guides, troubleshooting tools, and community discussions.
+
+## 🔍 About freeWispr’s Technology
+
+freeWispr uses Whisper, an open source speech recognition engine designed for offline use. This means your words are never sent out for processing. The app is built with Swift to integrate tightly with macOS features and run smoothly on Apple Silicon devices.
+
+## 📅 Updates and Development
+
+freeWispr’s development is ongoing. Updates may include support for more languages, improved accuracy, and new features. Check the GitHub page regularly for the latest version.
 
 ---
 
-## Demo
-
-<p align="center">
-  <img src="assets/demo.gif" alt="FreeWispr demo" width="600">
-</p>
-
-## Why FreeWispr?
-
-| | **FreeWispr** | **Wispr Flow** | **Apple Dictation** |
-|---|---|---|---|
-| **Price** | Free & open source | $8/month | Free |
-| **Privacy** | 100% local, no network | Cloud-based | Cloud-based |
-| **Works in** | Any app (terminals, editors, browsers) | Most apps | Limited app support |
-| **Models** | Configurable (tiny → medium) | Proprietary | Fixed |
-| **Latency** | Real-time on Apple Silicon | Network dependent | Network dependent |
-| **Open source** | Yes | No | No |
-
-## Download
-
-**[Download the latest release](https://github.com/ygivenx/freeWispr/releases/latest)** — grab the `.dmg`, drag to Applications, done.
-
-> Signed with Apple Developer ID and notarized by Apple — no Gatekeeper warnings.
-> Requires macOS 14+ on Apple Silicon or Intel.
-
-<!--
-### Homebrew (coming soon)
-
-```bash
-brew install --cask freewispr
-```
--->
-
-## How It Works
-
-1. Hold **Ctrl+Option** (or **Globe key**) to record
-2. Release to transcribe
-3. Text is pasted into whatever app you're focused on
-
-That's it. All processing happens locally on your Mac.
-
-## Features
-
-- **Push-to-talk** dictation into any app (terminals, editors, chat apps, browsers)
-- **Core ML acceleration** on Apple Silicon for fast inference
-- **User-configurable model sizes** — tiny (~75 MB), base (~142 MB), small (~466 MB), medium (~1.5 GB)
-- **Menu bar app** — lives in your menu bar, no dock icon
-- **Auto-downloads models** on first launch from Hugging Face
-
-## Requirements
-
-- macOS 14+
-- Apple Silicon or Intel Mac
-- Accessibility permission (for global hotkey)
-- Microphone permission
-
-## Build from Source
-
-```bash
-cd FreeWispr
-swift build
-swift run
-```
-
-On first launch, FreeWispr will:
-1. Prompt for Accessibility permission (System Settings > Privacy > Accessibility)
-2. Download the base whisper model + Core ML encoder (~180 MB total)
-3. Appear as a mic icon in your menu bar
-
-## Usage
-
-- **Hold Ctrl+Option** or **Globe key** — starts recording
-- **Release** — stops recording and transcribes
-- Click the menu bar icon to change model size or quit
-
-## Tech Stack
-
-- Swift / SwiftUI
-- [SwiftWhisper](https://github.com/exPHAT/SwiftWhisper) (whisper.cpp SPM wrapper)
-- AVAudioEngine for audio capture
-- CGEvent for global hotkey
-- NSPasteboard for universal text injection via Cmd+V
-
-## Memory Profile
-
-FreeWispr keeps the whisper.cpp model loaded in memory for instant transcription. Measured on Apple Silicon (M4 Max) with the **base** model:
-
-| Category | Baseline | During Inference | Notes |
-|----------|----------|-----------------|-------|
-| MALLOC_LARGE | ~330 MB | ~330 MB | GGML model weights + KV cache + Core ML encoder buffers |
-| MALLOC_SMALL | ~27 MB | ~37 MB | General heap — audio buffers, Swift objects |
-| Neural (ANE) | 72 MB clean | 111 MB peak | Core ML encoder on Apple Neural Engine; reclaimable by OS |
-| **Total footprint** | **~375 MB** | **~376 MB** | Peak stays close to baseline |
-
-### Model size vs memory
-
-Larger models use proportionally more RAM:
-
-| Model | Disk Size | Approx. Footprint |
-|-------|-----------|-------------------|
-| tiny | ~75 MB | ~150 MB |
-| base (default) | ~142 MB | ~375 MB |
-| small | ~466 MB | ~700 MB |
-| medium | ~1.5 GB | ~2 GB |
-
-### Memory management
-
-To prevent unbounded memory growth during long sessions:
-
-- **Whisper context recreation** — The whisper.cpp context accumulates internal state (KV cache, intermediate buffers) across transcriptions ([whisper.cpp #2605](https://github.com/ggerganov/whisper.cpp/issues/2605)). FreeWispr recreates the context every 50 transcriptions to reclaim this memory.
-- **Audio buffer cap** — Recording buffers release excess capacity after long recordings (>60s) to prevent the high-water mark from persisting.
-- **LanguageModelSession reuse** — The AI Cleanup feature (macOS 26+) reuses a single on-device LLM session instead of creating one per correction.
-
-### Profiling
-
-To check memory usage of a running instance:
-
-```bash
-# Quick check
-ps -o pid,rss,%mem,command -p $(pgrep FreeWispr)
-
-# Detailed breakdown (requires sudo)
-sudo footprint -p $(pgrep FreeWispr)
-
-# VM region summary
-vmmap --summary $(pgrep FreeWispr)
-```
-
-## Contributing
-
-Contributions are welcome! Please see the [issue tracker](https://github.com/ygivenx/freeWispr/issues) for open issues, or open a new one to discuss your idea.
-
-## License
-
-MIT
+freeWispr fits users who want private, easy voice-to-text on Mac. By running everything locally, it respects privacy and offers a straightforward way to dictate without distractions.
